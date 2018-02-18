@@ -3,14 +3,14 @@
 
 #include <QObject>
 #include <QTcpServer>
+#include <QNetworkSession>
 
 class EchoServer : public QObject
 {
     Q_OBJECT
   public:
-    explicit EchoServer(int port, QObject *parent = nullptr);
+    explicit EchoServer(quint16 port, QObject *parent = nullptr);
     explicit EchoServer(QObject *parent = nullptr);
-    EchoServer(const EchoServer &other); // if needed
 
     virtual ~EchoServer();
 
@@ -21,11 +21,13 @@ class EchoServer : public QObject
 
   private:
     QTcpServer *m_server;
-    QList<QTcpSocket*> m_sockets;
+    quint16 m_port;
+    QList<QTcpSocket*> m_clients;
 
   signals:
 
   public slots:
+    void newConnection();
 };
 
 #endif // ECHOSERVER_H
