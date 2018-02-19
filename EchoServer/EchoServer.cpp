@@ -36,7 +36,7 @@ quint16 EchoServer::getPort() const
 
 void EchoServer::start()
 {
-  connect(m_server, SIGNAL(newConnection()), this, SLOT(newClient()));
+  connect(m_server, SIGNAL(newConnection()), this, SLOT(slotNewClient()));
 
   if ( !m_server->listen(QHostAddress::Any, m_port) )
     qDebug() << m_server->errorString();
@@ -49,8 +49,18 @@ void EchoServer::stop()
 
 }
 
-void EchoServer::newClient()
+void EchoServer::slotNewClient()
 {
+  qDebug() << "new client!!!!";
 
+  QTcpSocket* clientSocket = m_server->nextPendingConnection();
+  m_clients.push_back(clientSocket);
+
+  connect( clientSocket, SIGNAL(readyRead()), this, SLOT(slotRead()) );
+}
+
+void EchoServer::slotRead()
+{
+  qDebug() << "ready to read";
 }
 

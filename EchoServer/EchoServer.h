@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpServer>
+#include <QTcpSocket>
 #include <QNetworkSession>
 
 class EchoServer : public QObject
@@ -27,7 +28,8 @@ class EchoServer : public QObject
   signals:
 
   public slots:
-    void newClient();
+    void slotNewClient();
+    void slotRead();
 };
 
 #endif // ECHOSERVER_H
