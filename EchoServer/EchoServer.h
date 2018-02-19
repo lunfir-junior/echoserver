@@ -27,7 +27,7 @@ class EchoServer : public QObject
   signals:
 
   public slots:
-    void newConnection();
+    void newClient();
 };
 
 #endif // ECHOSERVER_H
