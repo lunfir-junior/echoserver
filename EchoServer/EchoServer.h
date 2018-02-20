@@ -23,7 +23,7 @@ class EchoServer : public QObject
   private:
     QTcpServer *m_server;
     quint16 m_port;
-    QList<QTcpSocket*> m_clients;
+    QMap<uint, QTcpSocket*> m_clients;
 
   signals:
 

@@ -54,13 +54,21 @@ void EchoServer::slotNewClient()
   qDebug() << "new client!!!!";
 
   QTcpSocket* clientSocket = m_server->nextPendingConnection();
-  m_clients.push_back(clientSocket);
+  uint descriptor = clientSocket->socketDescriptor();
+  m_clients.insert(descriptor, clientSocket);
 
   connect( clientSocket, &QTcpSocket::readyRead, this, &EchoServer::slotRead );
 }
 
 void EchoServer::slotRead()
 {
+  QTcpSocket *clientSocket = (QTcpSocket*) sender();
+  uint descriptor = clientSocket->socketDescriptor();
+
+  QByteArray clientData = clientSocket->readAll();
+
   qDebug() << "ready to read";
+  qDebug() << m_clients;
+  qDebug() << "client data: " << clientData;
 }
 
