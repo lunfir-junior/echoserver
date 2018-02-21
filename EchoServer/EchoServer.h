@@ -30,6 +30,9 @@ class EchoServer : public QObject
   public slots:
     void slotNewClient();
     void slotRead();
+
+  Q_SIGNALS:
+    void destroyed();
 };
 
 #endif // ECHOSERVER_H

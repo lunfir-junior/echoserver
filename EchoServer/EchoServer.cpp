@@ -8,6 +8,9 @@ EchoServer::EchoServer(quint16 port, QObject *parent) : QObject(parent)
 
   m_server = new QTcpServer(this);
   m_port = port;
+
+  connect(m_server, &QTcpServer::newConnection, this, &EchoServer::slotNewClient);
+  connect(m_server, &QTcpServer::destroyed, this, &EchoServer::destroyed);
 }
 
 EchoServer::EchoServer(QObject *parent) : QObject(parent)
@@ -16,11 +19,14 @@ EchoServer::EchoServer(QObject *parent) : QObject(parent)
 
   m_server = new QTcpServer(this);
   m_port = DEFAULT_PORT;
+
+  connect(m_server, &QTcpServer::newConnection, this, &EchoServer::slotNewClient);
+  connect(m_server, &QTcpServer::destroyed, this, &EchoServer::destroyed);
 }
 
 EchoServer::~EchoServer()
 {
-//  qDeleteAll(m_sockets);
+  this->stop();
   delete m_server;
 }
 
@@ -36,8 +42,6 @@ quint16 EchoServer::getPort() const
 
 void EchoServer::start()
 {
-  connect(m_server, &QTcpServer::newConnection, this, &EchoServer::slotNewClient);
-
   if ( !m_server->listen(QHostAddress::Any, m_port) )
     qDebug() << m_server->errorString();
   else
@@ -46,7 +50,15 @@ void EchoServer::start()
 
 void EchoServer::stop()
 {
+  int len = m_clients.size();
 
+  for ( int i = 0; i < len; i++ ) {
+    m_clients[i]->close();
+    m_clients[i]->deleteLater();
+    m_clients.remove(i);
+  }
+
+  m_server->close();
 }
 
 void EchoServer::slotNewClient()
@@ -67,8 +79,17 @@ void EchoServer::slotRead()
 
   QByteArray clientData = clientSocket->readAll();
 
-  qDebug() << "ready to read";
-  qDebug() << m_clients;
-  qDebug() << "client data: " << clientData;
+  if ( clientData.toStdString() == "disconnect\r\n" ) {
+    clientSocket->close();
+    m_clients.remove(descriptor);
+    clientSocket->deleteLater();
+    qDebug() << "client data: " << clientData;
+    qDebug() << m_clients;
+  } else {
+    qDebug() << "ready to read";
+    qDebug() << m_clients;
+    qDebug() << "client data: " << clientData;
+    clientSocket->write(clientData);
+  }
 }
 

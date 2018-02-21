@@ -6,6 +6,7 @@ CONFIG += c++11
 TARGET = EchoServer
 CONFIG += console
 CONFIG -= app_bundle
+CONFIG += DEBUG
 
 TEMPLATE = app
 

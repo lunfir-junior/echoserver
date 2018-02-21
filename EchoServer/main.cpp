@@ -6,12 +6,9 @@ int main(int argc, char *argv[])
   QCoreApplication a(argc, argv);
 
   EchoServer server;
-
-  qDebug() << "before start: " << server.isRunning();
+  QObject::connect(&server, &EchoServer::destroyed, &a, &QCoreApplication::quit);
 
   server.start();
-
-  qDebug() << "after start: " << server.isRunning();
 
   return a.exec();
 }
