@@ -50,15 +50,12 @@ void EchoServer::start()
 
 void EchoServer::stop()
 {
-  int len = m_clients.size();
-
-  for ( int i = 0; i < len; i++ ) {
-    m_clients[i]->close();
-    m_clients[i]->deleteLater();
-    m_clients.remove(i);
-  }
-
   m_server->close();
+
+  foreach ( int i, m_clients.keys() ) {
+    m_clients[i]->close();
+  }
+  qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
 void EchoServer::slotNewClient()
@@ -69,10 +66,10 @@ void EchoServer::slotNewClient()
   uint descriptor = clientSocket->socketDescriptor();
   m_clients.insert(descriptor, clientSocket);
 
-  connect( clientSocket, &QTcpSocket::readyRead, this, &EchoServer::slotRead );
+  connect( clientSocket, &QTcpSocket::readyRead, this, &EchoServer::slotProcessData );
 }
 
-void EchoServer::slotRead()
+void EchoServer::slotProcessData()
 {
   QTcpSocket *clientSocket = (QTcpSocket*) sender();
   uint descriptor = clientSocket->socketDescriptor();
@@ -89,6 +86,7 @@ void EchoServer::slotRead()
     qDebug() << "ready to read";
     qDebug() << m_clients;
     qDebug() << "client data: " << clientData;
+
     clientSocket->write(clientData);
   }
 }

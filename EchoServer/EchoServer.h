@@ -29,7 +29,7 @@ class EchoServer : public QObject
 
   public slots:
     void slotNewClient();
-    void slotRead();
+    void slotProcessData();
 
   Q_SIGNALS:
     void destroyed();
