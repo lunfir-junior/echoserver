@@ -60,11 +60,12 @@ void EchoServer::stop()
 
 void EchoServer::slotNewClient()
 {
-  qDebug() << "new client!!!!";
-
+  qDebug() << "new client!!!";
   QTcpSocket* clientSocket = m_server->nextPendingConnection();
   uint descriptor = clientSocket->socketDescriptor();
   m_clients.insert(descriptor, clientSocket);
+
+  qDebug() << m_clients;
 
   connect( clientSocket, &QTcpSocket::readyRead, this, &EchoServer::slotProcessData );
 }
@@ -76,17 +77,13 @@ void EchoServer::slotProcessData()
 
   QByteArray clientData = clientSocket->readAll();
 
+  qDebug().noquote() << "client data: " << clientData;
+
   if ( clientData.toStdString() == "disconnect\r\n" ) {
     clientSocket->close();
     m_clients.remove(descriptor);
     clientSocket->deleteLater();
-    qDebug() << "client data: " << clientData;
-    qDebug() << m_clients;
   } else {
-    qDebug() << "ready to read";
-    qDebug() << m_clients;
-    qDebug() << "client data: " << clientData;
-
     clientSocket->write(clientData);
   }
 }
